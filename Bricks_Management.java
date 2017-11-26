@@ -11,29 +11,40 @@ public class Bricks_Management {
 		createTable();
 		//create_order();
 		retrieve_order();
+
 	}
 	
 	
 	public static void retrieve_order() throws Exception{
 		try{
-			System.out.println("Reference Number: \n");
-			Scanner scanner = new Scanner(System.in);
-			String reference_number = scanner.nextLine();
-		
-			Connection con = getConnection();
-			PreparedStatement retrieve = con.prepareStatement("SELECT Order_Reference_Number,Number_of_Bricks FROM Orders where Order_Reference_Number ="+reference_number);
-			ResultSet result = retrieve.executeQuery();
-		
-			if(result.next()){
-				String reference = result.getString(1);
-				String number_of_bricks = result.getString(2);
-				System.out.println("Reference Number: "+reference+" Number of Bricks: "+number_of_bricks);
+			System.out.println("How many orders to retrieve: \n");
+			Scanner scanner1 = new Scanner(System.in);
+			String num_of_orders = scanner1.nextLine();
+			int num_of_orders_int = Integer.parseInt(num_of_orders);
+			if(num_of_orders_int > 0){
+				for(int i = 0; i < num_of_orders_int; i++){
+					System.out.println("Reference Number: \n");
+					Scanner scanner2 = new Scanner(System.in);
+					String reference_number = scanner2.nextLine();
+				
+					Connection con = getConnection();
+					PreparedStatement retrieve = con.prepareStatement("SELECT Order_Reference_Number,Number_of_Bricks FROM Orders where Order_Reference_Number ="+reference_number);
+					ResultSet result = retrieve.executeQuery();
+			
+					if(result.next()){
+						String reference = result.getString(1);
+						String number_of_bricks = result.getString(2);
+						System.out.println("Reference Number: "+reference+" Number of Bricks: "+number_of_bricks);
+					}else{
+						System.out.println("Reference Number not found");
+					}
+					con.close();
+				}
 			}else{
-				System.out.println("Reference Number not found");
+				System.out.println("Invalid number");
 			}
-			con.close();
 		}catch (Exception e){
-			System.out.println("Invalid Reference Number");
+			System.out.println("Invalid Data");
 		}
 	}
 	
