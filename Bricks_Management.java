@@ -1,13 +1,37 @@
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.util.Scanner;
 
 
 public class Bricks_Management {
 
 	public static void main(String[] args) throws Exception {
 		createTable();
+		create_order();
 
+	}
+	
+	public static void create_order() throws Exception{
+		try{
+			//getting order's info
+			System.out.println("Customer's Surname: ");
+			Scanner scanner = new Scanner(System.in);
+			String customers_surname = scanner.nextLine();
+			System.out.println("Customer's Name: ");
+			String customers_name = scanner.nextLine();
+			System.out.println("Number of Bricks: ");
+			int number_of_bricks = Integer.parseInt(scanner.nextLine());
+			
+			//making insert query
+			Connection con = getConnection();
+			PreparedStatement insert = con.prepareStatement("INSERT INTO Orders(Customer_Surname,Customer_Name,Number_of_Bricks,Dispatched,Dispatched_Date) VALUES ('"+customers_surname+"','"+customers_name+"','"+number_of_bricks+"','NO','')");
+			insert.executeUpdate();
+			con.close();
+			System.out.println("\nOrder created");
+		}catch(Exception e){
+			System.out.println("Cannot create order. Invalid data");
+		}
 	}
 
 	public static void createTable() throws Exception{
@@ -39,3 +63,4 @@ public class Bricks_Management {
 		return null;
 	}
 }
+
