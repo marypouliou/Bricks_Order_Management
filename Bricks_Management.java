@@ -1,6 +1,7 @@
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.Scanner;
 
 
@@ -8,9 +9,34 @@ public class Bricks_Management {
 
 	public static void main(String[] args) throws Exception {
 		createTable();
-		create_order();
-
+		//create_order();
+		retrieve_order();
 	}
+	
+	
+	public static void retrieve_order() throws Exception{
+		try{
+			System.out.println("Reference Number: \n");
+			Scanner scanner = new Scanner(System.in);
+			String reference_number = scanner.nextLine();
+		
+			Connection con = getConnection();
+			PreparedStatement retrieve = con.prepareStatement("SELECT Order_Reference_Number,Number_of_Bricks FROM Orders where Order_Reference_Number ="+reference_number);
+			ResultSet result = retrieve.executeQuery();
+		
+			if(result.next()){
+				String reference = result.getString(1);
+				String number_of_bricks = result.getString(2);
+				System.out.println("Reference Number: "+reference+" Number of Bricks: "+number_of_bricks);
+			}else{
+				System.out.println("Reference Number not found");
+			}
+			con.close();
+		}catch (Exception e){
+			System.out.println("Invalid Reference Number");
+		}
+	}
+	
 	
 	public static void create_order() throws Exception{
 		try{
