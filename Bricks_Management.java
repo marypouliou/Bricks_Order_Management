@@ -2,6 +2,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Scanner;
 
 
@@ -11,8 +13,42 @@ public class Bricks_Management {
 		createTable();
 		//create_order();
 		//retrieve_order();
-		update_order();
-
+		//update_order();
+		dispatch_order();
+	}
+	
+	public static void dispatch_order() throws Exception{
+		try{
+			System.out.println("Order Reference Number to dispatch: ");
+			Scanner scanner1 = new Scanner(System.in);
+			String ref_num = scanner1.nextLine();
+			int ref_num_int = Integer.parseInt(ref_num);
+			
+			if(ref_num_int > 0){
+				Connection con = getConnection();
+				PreparedStatement retrieve = con.prepareStatement("SELECT Order_Reference_Number,Dispatched, Dispatched_Date FROM Orders where Order_Reference_Number ="+ref_num_int);
+				ResultSet result = retrieve.executeQuery();
+	
+				if(result.next()){
+					String reference = result.getString(1);
+					String Dispatched = result.getString(2);
+					String Dispatched_Date = result.getString(3);
+					if(Dispatched.equals("NO")){
+						String timeStamp = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(Calendar.getInstance().getTime());
+						PreparedStatement set_dispatched = con.prepareStatement("UPDATE Orders SET Dispatched = 'YES', Dispatched_Date = '"+timeStamp+"' where Order_Reference_Number ="+reference);
+						set_dispatched.executeUpdate();
+						System.out.println("\nUpdate is Complete");
+					}else if (Dispatched.equals("YES")){
+						System.out.println("\n400 bad request response. Order with Reference Number: "+reference+" has already been dispatched on: "+Dispatched_Date);
+					}
+				}
+				con.close();
+			}else{
+				System.out.println("\nInvalid Reference Number.");
+			}
+		}catch (Exception e){
+			System.out.println("\nInvalid Reference Number.");
+		}
 	}
 	
 	public static void update_order() throws Exception{
@@ -42,7 +78,7 @@ public class Bricks_Management {
 				}
 				con.close();
 			}else{
-				System.out.println("\nInvalid number.");
+				System.out.println("\nInvalid Reference Number.");
 			}
 		}catch (Exception e){
 			System.out.println("\nInvalid Reference Number.");
