@@ -10,10 +10,44 @@ public class Bricks_Management {
 	public static void main(String[] args) throws Exception {
 		createTable();
 		//create_order();
-		retrieve_order();
+		//retrieve_order();
+		update_order();
 
 	}
 	
+	public static void update_order() throws Exception{
+		try{
+			System.out.println("Order Reference Number: ");
+			Scanner scanner1 = new Scanner(System.in);
+			int ref_num = Integer.parseInt(scanner1.nextLine());
+		
+			if(ref_num > 0){
+				Connection con = getConnection();
+				PreparedStatement retrieve = con.prepareStatement("SELECT Order_Reference_Number,Number_of_Bricks FROM Orders where Order_Reference_Number ="+ref_num);
+				ResultSet result = retrieve.executeQuery();
+	
+				if(result.next()){
+					String reference = result.getString(1);
+					String number_of_bricks = result.getString(2);
+					System.out.println("Order with Reference Number: "+reference+" has "+number_of_bricks+" bricks.");
+					System.out.println("New number of bricks: ");
+					Scanner scanner2 = new Scanner(System.in);
+					String bricks_num = scanner2.nextLine();
+						
+					PreparedStatement update = con.prepareStatement("UPDATE Orders set Number_of_Bricks = "+bricks_num+" where Order_Reference_Number ="+reference);
+					update.executeUpdate();
+					System.out.println("\nUpdate is Complete.");
+				}else{
+					System.out.println("\nReference Number not found.");
+				}
+				con.close();
+			}else{
+				System.out.println("\nInvalid number.");
+			}
+		}catch (Exception e){
+			System.out.println("\nInvalid Reference Number.");
+		}
+	}
 	
 	public static void retrieve_order() throws Exception{
 		try{
@@ -36,15 +70,15 @@ public class Bricks_Management {
 						String number_of_bricks = result.getString(2);
 						System.out.println("Reference Number: "+reference+" Number of Bricks: "+number_of_bricks);
 					}else{
-						System.out.println("Reference Number not found");
+						System.out.println("Reference Number not found.");
 					}
 					con.close();
 				}
 			}else{
-				System.out.println("Invalid number");
+				System.out.println("Invalid number.");
 			}
 		}catch (Exception e){
-			System.out.println("Invalid Data");
+			System.out.println("Invalid Data.");
 		}
 	}
 	
@@ -67,7 +101,7 @@ public class Bricks_Management {
 			con.close();
 			System.out.println("\nOrder created");
 		}catch(Exception e){
-			System.out.println("Cannot create order. Invalid data");
+			System.out.println("Cannot create order. Invalid data.");
 		}
 	}
 
