@@ -14,7 +14,8 @@ public class Bricks_Management {
 		//create_order();
 		//retrieve_order();
 		//update_order();
-		dispatch_order();
+		//dispatch_order();
+		update_order();
 	}
 	
 	public static void dispatch_order() throws Exception{
@@ -41,6 +42,8 @@ public class Bricks_Management {
 					}else if (Dispatched.equals("YES")){
 						System.out.println("\n400 bad request response. Order with Reference Number: "+reference+" has already been dispatched on: "+Dispatched_Date);
 					}
+				}else{
+					System.out.println("\nReference Number not found.");
 				}
 				con.close();
 			}else{
@@ -59,20 +62,26 @@ public class Bricks_Management {
 		
 			if(ref_num > 0){
 				Connection con = getConnection();
-				PreparedStatement retrieve = con.prepareStatement("SELECT Order_Reference_Number,Number_of_Bricks FROM Orders where Order_Reference_Number ="+ref_num);
+				PreparedStatement retrieve = con.prepareStatement("SELECT Order_Reference_Number,Number_of_Bricks,Dispatched, Dispatched_Date FROM Orders where Order_Reference_Number ="+ref_num);
 				ResultSet result = retrieve.executeQuery();
 	
 				if(result.next()){
 					String reference = result.getString(1);
 					String number_of_bricks = result.getString(2);
-					System.out.println("Order with Reference Number: "+reference+" has "+number_of_bricks+" bricks.");
-					System.out.println("New number of bricks: ");
-					Scanner scanner2 = new Scanner(System.in);
-					String bricks_num = scanner2.nextLine();
+					String dispatched = result.getString(3);
+					String dispatched_date = result.getString(4);
+					if(dispatched.equals("NO")){
+						System.out.println("Order with Reference Number: "+reference+" has "+number_of_bricks+" bricks.");
+						System.out.println("New number of bricks: ");
+						Scanner scanner2 = new Scanner(System.in);
+						String bricks_num = scanner2.nextLine();
 						
-					PreparedStatement update = con.prepareStatement("UPDATE Orders set Number_of_Bricks = "+bricks_num+" where Order_Reference_Number ="+reference);
-					update.executeUpdate();
-					System.out.println("\nUpdate is Complete.");
+						PreparedStatement update = con.prepareStatement("UPDATE Orders set Number_of_Bricks = "+bricks_num+" where Order_Reference_Number ="+reference);
+						update.executeUpdate();
+						System.out.println("\nUpdate is Complete.");
+					}else if(dispatched.equals("YES")){
+							System.out.println("400 bad request response. Order with Reference Number: "+reference+" has been dispatched on: "+dispatched_date);
+					}
 				}else{
 					System.out.println("\nReference Number not found.");
 				}
