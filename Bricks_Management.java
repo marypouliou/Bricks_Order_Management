@@ -1,3 +1,5 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -11,11 +13,42 @@ public class Bricks_Management {
 
 	public static void main(String[] args) throws Exception {
 		createTable();
-		//create_order();
-		//retrieve_order();
-		//update_order();
-		//dispatch_order();
-		update_order();
+		menu();
+	}
+	
+	public static void menu() throws Exception{
+		System.out.println("\nMenu");
+		System.out.println("1 -> Create Order");
+		System.out.println("2 -> Retrieve Order");
+		System.out.println("3 -> Update Order");
+		System.out.println("4 -> Dispatch Order");
+		try{
+			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+			String s = br.readLine();
+			int menu_item = Integer.parseInt(s);
+			if(menu_item == 1 || menu_item == 2 || menu_item == 3 || menu_item == 4){
+				switch(menu_item){
+					case 1:
+						create_order();
+						break;
+					case 2:
+						retrieve_order();
+						break;
+					case 3:
+						update_order();
+						break;
+					case 4:
+						dispatch_order();
+						break;
+				}
+			}else{
+				System.out.println("\nPlease select a choice from the menu\n");
+				menu();
+			}
+		}catch(Exception e){
+			System.out.println("\nInvalid Data\n");
+			menu();
+		}
 	}
 	
 	public static void dispatch_order() throws Exception{
@@ -52,6 +85,7 @@ public class Bricks_Management {
 		}catch (Exception e){
 			System.out.println("\nInvalid Reference Number.");
 		}
+		menu();
 	}
 	
 	public static void update_order() throws Exception{
@@ -75,10 +109,14 @@ public class Bricks_Management {
 						System.out.println("New number of bricks: ");
 						Scanner scanner2 = new Scanner(System.in);
 						String bricks_num = scanner2.nextLine();
-						
-						PreparedStatement update = con.prepareStatement("UPDATE Orders set Number_of_Bricks = "+bricks_num+" where Order_Reference_Number ="+reference);
-						update.executeUpdate();
-						System.out.println("\nUpdate is Complete.");
+						int bricks_num_int = Integer.parseInt(bricks_num);
+						if(bricks_num_int > 0){
+							PreparedStatement update = con.prepareStatement("UPDATE Orders set Number_of_Bricks = "+bricks_num+" where Order_Reference_Number ="+reference);
+							update.executeUpdate();
+							System.out.println("\nUpdate is Complete.");
+						}else{
+							System.out.println("Invalid Number of Bricks");
+						}
 					}else if(dispatched.equals("YES")){
 							System.out.println("400 bad request response. Order with Reference Number: "+reference+" has been dispatched on: "+dispatched_date);
 					}
@@ -92,6 +130,7 @@ public class Bricks_Management {
 		}catch (Exception e){
 			System.out.println("\nInvalid Reference Number.");
 		}
+		menu();
 	}
 	
 	public static void retrieve_order() throws Exception{
@@ -125,6 +164,7 @@ public class Bricks_Management {
 		}catch (Exception e){
 			System.out.println("Invalid Data.");
 		}
+		menu();
 	}
 	
 	
@@ -139,15 +179,20 @@ public class Bricks_Management {
 			System.out.println("Number of Bricks: ");
 			int number_of_bricks = Integer.parseInt(scanner.nextLine());
 			
-			//making insert query
-			Connection con = getConnection();
-			PreparedStatement insert = con.prepareStatement("INSERT INTO Orders(Customer_Surname,Customer_Name,Number_of_Bricks,Dispatched,Dispatched_Date) VALUES ('"+customers_surname+"','"+customers_name+"','"+number_of_bricks+"','NO','')");
-			insert.executeUpdate();
-			con.close();
-			System.out.println("\nOrder created");
+			if(number_of_bricks > 0){
+				//making insert query
+				Connection con = getConnection();
+				PreparedStatement insert = con.prepareStatement("INSERT INTO Orders(Customer_Surname,Customer_Name,Number_of_Bricks,Dispatched,Dispatched_Date) VALUES ('"+customers_surname+"','"+customers_name+"','"+number_of_bricks+"','NO','')");
+				insert.executeUpdate();
+				con.close();
+				System.out.println("\nOrder created");
+			}else{
+				System.out.println("\nInvalid Number of Bricks");
+			}
 		}catch(Exception e){
 			System.out.println("Cannot create order. Invalid data.");
 		}
+		menu();
 	}
 
 	public static void createTable() throws Exception{
